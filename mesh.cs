@@ -27,7 +27,7 @@ namespace Template
 
         public void TransformObject(Matrix4 translation)
         {
-            localTransform = translation;
+            localTransform *= translation;
         }
 
 
