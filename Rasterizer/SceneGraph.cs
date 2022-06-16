@@ -19,7 +19,7 @@ the tree, while combining matrices so that each mesh is drawn using the correct
 combined matrix. DONE
 
 ▪ Call the Render method of the SceneGraph from the Game class, using a camera matrix
-that is updated based on user input.
+that is updated based on user input. DONE
 */
 
 namespace Rasterizer
@@ -33,7 +33,7 @@ namespace Rasterizer
         Texture? wood;
         RenderTarget? target;
         ScreenQuad? quad;
-        readonly bool useRenderTarget = true;
+        readonly bool useRenderTarget = false;
 
         Matrix4 perspectiveMatrix;
 
@@ -44,6 +44,7 @@ namespace Rasterizer
         MeshNode firstPot;
         MeshNode secondPot;
         MeshNode plane;
+        MeshNode ape;
         public SceneGraph(int width, int height)
         {
             perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView(1.2f, 1.3f, .1f, 1000);
@@ -57,13 +58,18 @@ namespace Rasterizer
             firstPot = new MeshNode(new Mesh("../../../assets/teapot.obj"));
             secondPot = new MeshNode(new Mesh("../../../assets/teapot.obj"));
             plane = new MeshNode(new Mesh("../../../assets/floor.obj"));
+            ape = new MeshNode(new Mesh("../../../assets/monkey.obj"));
 
             world.AddChild(firstPot);
             world.AddChild(plane);
-            float angle90degrees = MathF.PI / 2f;
-
-            firstPot.thisMesh?.TransformObject(Matrix4.CreateScale(1f) * Matrix4.CreateFromAxisAngle(new Vector3(-1, 0, 0), angle90degrees));
-            plane.thisMesh?.TransformObject(Matrix4.CreateScale(1f) * Matrix4.CreateFromAxisAngle(new Vector3(-1, 0, 0), angle90degrees));
+            world.AddChild(ape);
+            if (ape.thisMesh != null)
+            {
+                Console.WriteLine("Mesh created");
+            }
+            
+            firstPot.thisMesh?.TransformObject(Matrix4.CreateScale(1f));
+            plane.thisMesh?.TransformObject(Matrix4.CreateScale(1f));
 
             firstPot.AddChild(secondPot);
             secondPot.thisMesh?.TransformObject(Matrix4.CreateScale(0.5f) * Matrix4.CreateTranslation(new Vector3(10, 0, 0)));
@@ -73,7 +79,7 @@ namespace Rasterizer
         {
             float frameDuration = (float)timer.Elapsed.TotalSeconds;
             float calc = 1 / frameDuration;
-            Console.WriteLine("FPS: " + calc);
+            //Console.WriteLine("FPS: " + calc);
             timer.Reset();
             timer.Start();
 
@@ -81,7 +87,7 @@ namespace Rasterizer
             if (useRenderTarget) target?.Bind();
             RenderFromChildNode(world, cameraM, Matrix4.Identity);
             if (useRenderTarget) target?.Unbind();
-            if (postProc != null && target != null && quad != null)
+            if (useRenderTarget && postProc != null && target != null && quad != null)
             {
                 quad.Render(postProc, target.GetTextureID());
             }
@@ -93,7 +99,6 @@ namespace Rasterizer
                 MeshNode childNode = node.childNodes[i];
                 if (renderShader != null && wood != null && childNode.thisMesh != null)
                 {
-                    Console.WriteLine(i);
                     childNode.thisMesh.Render(renderShader,childNode.thisMesh.localTransform * parentMatrix * cameraM * perspectiveMatrix, wood);
                     RenderFromChildNode(childNode, cameraM, childNode.thisMesh.localTransform);
                 }

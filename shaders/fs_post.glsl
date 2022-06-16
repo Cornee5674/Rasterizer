@@ -15,7 +15,7 @@ void main()
 	// apply dummy postprocessing effect
 float dist = P.x * P.x + P.y * P.y;
 	// RIPPLES
-	//outputColor *= sin( dist * 50 ) * 0.25f + 0.75f;
+	outputColor *= sin( dist * 50 ) * 0.25f + 0.75f;
 }
 
 // EOF

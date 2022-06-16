@@ -51,7 +51,7 @@ namespace Template
             GL.ClearColor(0, 0, 0, 0);
             GL.Disable(EnableCap.DepthTest);
             Surface screen = new(ClientSize.X, ClientSize.Y);
-            app = new MyApplication(screen);
+            app = new MyApplication(screen, KeyboardState);
             screenID = app.screen.GenTexture();
             if(allowPrehistoricOpenGL)
             {
@@ -88,7 +88,7 @@ namespace Template
             base.OnUpdateFrame(e);
             // called once per frame; app logic
             var keyboard = KeyboardState;
-            if (keyboard[Keys.Escape]) terminated = true;
+            if (keyboard[Keys.Escape]) terminated = true;   
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -134,7 +134,7 @@ namespace Template
                 }
                 // prepare for generic OpenGL rendering
                 GL.Enable(EnableCap.DepthTest);
-                GL.Clear(ClearBufferMask.DepthBufferBit);
+                GL.Clear(ClearBufferMask.DepthBufferBit);                
                 // do OpenGL rendering
                 app.RenderGL();
             }
