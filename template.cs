@@ -146,7 +146,7 @@ namespace Template
             // entry point
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
             using OpenTKApp app = new();
-            app.RenderFrequency = 30.0;
+            //app.RenderFrequency = 30.0;
             app.Run();
         }
     }

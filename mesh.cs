@@ -17,12 +17,21 @@ namespace Template
         int quadBufferId;                       // quad buffer (not in Modern OpenGL)
 
         public Matrix4 localTransform = Matrix4.Identity;
+        public Texture localTexture;
+        public Shader localShader;
+
+        public Vector3 specularCoefficient;
+        public int n;
 
         // constructor
-        public Mesh(string fileName)
+        public Mesh(string fileName, Texture localTexture, Shader localShader, Vector3 specularCoefficient, int n )
         {
             MeshLoader loader = new();
             loader.Load(this, fileName);
+            this.localTexture = localTexture;
+            this.localShader = localShader;
+            this.specularCoefficient = specularCoefficient;
+            this.n = n;
         }
 
         public void TransformObject(Matrix4 translation)
@@ -57,7 +66,7 @@ namespace Template
         }
 
         // render the mesh using the supplied shader and matrix
-        public void Render(Shader shader, Matrix4 transform, Texture texture)
+        public void Render(Shader shader, Matrix4 objectToScreen, Matrix4 objectToWorld, Texture texture, Vector3 lightColor, Vector3 lightPosition, Vector3 cameraPosition, Vector3 specular, int n)
         {
             // on first run, prepare buffers
             Prepare();
@@ -71,20 +80,27 @@ namespace Template
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, texture.id);
             // pass transform to vertex shader
-            GL.UniformMatrix4(shader.uniform_mview, false, ref transform);
+            GL.UniformMatrix4(shader.uniform_mview, false, ref objectToScreen);
+            GL.UniformMatrix4(shader.uniform_wview, false, ref objectToWorld);
+            GL.Uniform3(shader.uniform_cameraPos, cameraPosition);
+            GL.Uniform3(shader.uniform_lightPos, lightPosition);
+            GL.Uniform3(shader.uniform_lightColor, lightColor);
+            GL.Uniform3(shader.uniform_specular, specular);
+            GL.Uniform1(shader.uniform_n, n);
+
 
             // enable position, normal and uv attributes
-            GL.EnableVertexAttribArray(shader.attribute_vpos);
-            GL.EnableVertexAttribArray(shader.attribute_vnrm);
             GL.EnableVertexAttribArray(shader.attribute_vuvs);
+            GL.EnableVertexAttribArray(shader.attribute_vnrm);
+            GL.EnableVertexAttribArray(shader.attribute_vpos);
 
             // bind vertex data
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferId);
 
             // link vertex attributes to shader parameters 
-            GL.VertexAttribPointer(shader.attribute_vuvs, 2, VertexAttribPointerType.Float, false, 32, 0);
-            GL.VertexAttribPointer(shader.attribute_vnrm, 3, VertexAttribPointerType.Float, true, 32, 2 * 4);
             GL.VertexAttribPointer(shader.attribute_vpos, 3, VertexAttribPointerType.Float, false, 32, 5 * 4);
+            GL.VertexAttribPointer(shader.attribute_vnrm, 3, VertexAttribPointerType.Float, true, 32, 2 * 4);
+            GL.VertexAttribPointer(shader.attribute_vuvs, 2, VertexAttribPointerType.Float, false, 32, 0);
 
             // bind triangle index data and render
             if (triangles != null && triangles.Length > 0)
