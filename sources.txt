@@ -1,1 +1,8 @@
 ﻿https://learnopengl.com/Getting-started/Camera
+https://www.reddit.com/r/opengl/comments/s480zp/why_my_camera_is_rotating_around_world_origin/
+https://gamedev.stackexchange.com/questions/104851/rotating-the-view-around-the-origin-of-the-world-coordinate-system
+http://pyopengl.sourceforge.net/context/tutorials/shader_7.html
+https://computergraphics.stackexchange.com/questions/5323/dynamic-array-in-glsl
+https://community.khronos.org/t/uniform-array-length/72438/2
+
+All the meshes are created by myself (except the teapots), as was probably clear from the quality.

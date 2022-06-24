@@ -9,6 +9,7 @@ namespace Rasterizer
 {
     public class MeshNode
     {
+        // A mesh node stores a list of children meshnodes, and the mesh itself.
         public List<MeshNode> childNodes;
         public Mesh? thisMesh;
 

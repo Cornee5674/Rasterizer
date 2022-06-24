@@ -86,6 +86,7 @@ namespace Template
             GL.Uniform3(shader.uniform_specular, specular);
             GL.Uniform1(shader.uniform_n, n);
 
+            // To pass an array of vectors, a float array needs to be created with all the data of all the vectors in a row.
             float[] lightPositionsFloat = new float[lightPositions.Count * 3];
             float[] lightColorsFloat = new float[lightColors.Count * 3];
             for (int i = 0; i < lightPositions.Count; i++)
