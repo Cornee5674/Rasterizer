@@ -38,7 +38,7 @@ namespace Template
         public OpenTKApp()
             : base(GameWindowSettings.Default, new NativeWindowSettings()
             {
-                Size = new Vector2i(3500, 1750),
+                Size = new Vector2i(3700, 1750),
                 Profile = allowPrehistoricOpenGL ? ContextProfile.Compatability : ContextProfile.Core,  // required for fixed-function, which is probably not supported on MacOS
             })
         {

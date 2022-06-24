@@ -14,7 +14,7 @@ namespace Template
         SceneGraph sceneGraph;
         Matrix4 Tcamera;
 
-        Vector3 cameraPos = (0, 0, 20);
+        Vector3 cameraPos = (0, 5, 20);
         Vector3 forward = (0, 0, -1);
         Vector3 up = (0, 1, 0);
 

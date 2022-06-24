@@ -25,6 +25,7 @@ void main()
 	for (int i = 0; i < amountOfLights; i++){
 		color += calcColor(lightArrayPos[i], lightArrayCol[i], diffuseColor);
 	}
+	
 	color += vec4(diffuseColor * 0.15, 1.0);
 }
 
@@ -34,7 +35,7 @@ vec4 calcColor(vec3 lightPos, vec3 lightCol, vec3 diffuseCol){
 	float NdotL = max(0, dot(normalize(normal.xyz), normalize(L)));
 
 	vec3 R = L - 2 * dot(L, normal.xyz) * normal.xyz;
-	vec3 V = position.xyz - cameraPosition;
+	vec3 V = cameraPosition - position.xyz;
 	float VdotR = max(0, dot(normalize(V.xyz), normalize(R)));
 	float VdotRpow = pow(VdotR, n);
 
