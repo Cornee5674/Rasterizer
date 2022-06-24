@@ -66,7 +66,7 @@ namespace Template
         }
 
         // render the mesh using the supplied shader and matrix
-        public void Render(Shader shader, Matrix4 objectToScreen, Matrix4 objectToWorld, Texture texture, Vector3 lightColor, Vector3 lightPosition, Vector3 cameraPosition, Vector3 specular, int n)
+        public void Render(Shader shader, List<Vector3> lightPositions, List<Vector3> lightColors, Matrix4 objectToScreen, Matrix4 objectToWorld, Texture texture, Vector3 cameraPosition, Vector3 specular, int n)
         {
             // on first run, prepare buffers
             Prepare();
@@ -83,11 +83,26 @@ namespace Template
             GL.UniformMatrix4(shader.uniform_mview, false, ref objectToScreen);
             GL.UniformMatrix4(shader.uniform_wview, false, ref objectToWorld);
             GL.Uniform3(shader.uniform_cameraPos, cameraPosition);
-            GL.Uniform3(shader.uniform_lightPos, lightPosition);
-            GL.Uniform3(shader.uniform_lightColor, lightColor);
             GL.Uniform3(shader.uniform_specular, specular);
             GL.Uniform1(shader.uniform_n, n);
 
+            float[] lightPositionsFloat = new float[lightPositions.Count * 3];
+            float[] lightColorsFloat = new float[lightColors.Count * 3];
+            for (int i = 0; i < lightPositions.Count; i++)
+            {
+                // 0, 1, 2, 1, 2, 3, 2, 3, 4
+                lightPositionsFloat[i + (i * 2)] = lightPositions[i].X; //0 + 0 : 1 + 3  : 2 + 6
+                lightPositionsFloat[i + 1 + (i * 2)] = lightPositions[i].Y; // 0+1 + 0 : 2 + 3
+                lightPositionsFloat[i + 2 + (i * 2)] = lightPositions[i].Z;// 0 + 2 + 0: 3 + 3
+                lightColorsFloat[i + (i * 2)] = lightColors[i].X;
+                lightColorsFloat[i + 1 + (i * 2)] = lightColors[i].Y;
+                lightColorsFloat[i + 2 + (i * 2)] = lightColors[i].Z;
+            } 
+            
+
+            GL.Uniform3(shader.uniform_lightArrayPos, lightPositions.Count, lightPositionsFloat);
+            GL.Uniform3(shader.uniform_lightArrayCol, lightColors.Count, lightColorsFloat);
+            GL.Uniform1(shader.amountOfLights, lightPositions.Count);
 
             // enable position, normal and uv attributes
             GL.EnableVertexAttribArray(shader.attribute_vuvs);

@@ -20,6 +20,10 @@ namespace Template
         public int uniform_n;
         public int uniform_specular;
 
+        public int uniform_lightArrayPos;
+        public int uniform_lightArrayCol;
+        public int amountOfLights;
+
 
         // constructor
         public Shader(String vertexShader, String fragmentShader)
@@ -43,6 +47,10 @@ namespace Template
             uniform_lightPos = GL.GetUniformLocation(programID, "lightPosition");
             uniform_lightColor = GL.GetUniformLocation(programID, "lightColor");
             uniform_cameraPos = GL.GetUniformLocation(programID, "cameraPosition");
+
+            uniform_lightArrayPos = GL.GetUniformLocation(programID, "lightArrayPos");
+            uniform_lightArrayCol = GL.GetUniformLocation(programID, "lightArrayCol");
+            amountOfLights = GL.GetUniformLocation(programID, "amountOfLights");
         }
 
         // loading shaders

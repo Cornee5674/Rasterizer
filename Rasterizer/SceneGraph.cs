@@ -50,10 +50,11 @@ namespace Rasterizer
         MeshNode secondPot;
         MeshNode plane;
         MeshNode ape;
-        MeshNode lamp;
 
-        Vector3 lightColor;
-        Vector3 lightPosition;
+        List<MeshNode> lights;
+
+        List<Vector3> lightColors;
+        List<Vector3> lightPositions;
         public SceneGraph(int width, int height)
         {
             perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView(1.2f, 1.3f, .1f, 1000);
@@ -68,29 +69,67 @@ namespace Rasterizer
             grey = new Texture("../../../assets/grey.jpg");
             if (useRenderTarget) target = new RenderTarget(width, height);
             quad = new ScreenQuad();
+            lightColors = new List<Vector3>();
+            lightPositions = new List<Vector3>();
+            lights = new List<MeshNode>();
 
-            lightColor = (400, 400, 400);
-            lightPosition = (0, 10, 10);
+            lightPositions.Add((0, 10, 20));
+            lightColors.Add((400, 400, 400));
+            lightPositions.Add((0, 10, -20));
+            lightColors.Add((400, 400, 400));
+            lightPositions.Add((20, 10, 0));
+            lightColors.Add((400, 400, 400));
 
             firstPot = new MeshNode(new Mesh("../../../assets/teapot.obj", yellow, diffuseColorShader, (0, 0, 0), 1));
             secondPot = new MeshNode(new Mesh("../../../assets/teapot.obj", grey, glossyDiffuseShader, (1f, 1f, 1f), 15));
             plane = new MeshNode(new Mesh("../../../assets/floor.obj", wood, diffuseColorShader, (0.4f, 0.4f, 0.4f), 15));
             ape = new MeshNode(new Mesh("../../../assets/monkey.obj", wood, diffuseColorShader, (0, 0, 0), 1));
-            lamp = new MeshNode(new Mesh("../../../assets/lamp.obj", yellow, staticColorShader, (0, 0, 0), 1));
+
+            lights.Add(new MeshNode(new Mesh("../../../assets/lamp.obj", yellow, staticColorShader, (0, 0, 0), 1)));
+            lights.Add(new MeshNode(new Mesh("../../../assets/lamp.obj", yellow, staticColorShader, (0, 0, 0), 1)));
+            lights.Add(new MeshNode(new Mesh("../../../assets/lamp.obj", yellow, staticColorShader, (0, 0, 0), 1)));
 
             world.AddChild(firstPot);
             world.AddChild(plane);
             world.AddChild(ape);
-            world.AddChild(lamp);
           
             firstPot.thisMesh?.TransformObject(Matrix4.CreateScale(1f));
             plane.thisMesh?.TransformObject(Matrix4.CreateScale(1f));
-            lamp.thisMesh?.TransformObject(Matrix4.CreateTranslation(lightPosition));
 
             firstPot.AddChild(secondPot);
             secondPot.thisMesh?.TransformObject(Matrix4.CreateScale(0.5f) * Matrix4.CreateTranslation(new Vector3(10, 0, 0)));
 
+            InitLights();
             Console.WriteLine(GL.GetError());
+        }
+
+        public void InitLights()
+        {
+            for (int i = 0; i < lights.Count; i++)
+            {
+                lights[i].thisMesh?.TransformObject(Matrix4.CreateTranslation(lightPositions[i]));
+                world.AddChild(lights[i]);
+            }
+        }
+
+        int sign = 1;
+        int x = 2;
+        float moved = 0;
+        public void LampAnimation(float frameDuration)
+        {
+            if (moved >= 10)
+            {
+                moved = 0;
+                sign *= -1;
+            }
+            Vector3 move = new Vector3(x * frameDuration * sign, 0, 0);
+            Console.WriteLine(moved);
+            moved += Math.Abs(x * frameDuration);
+            for (int i = 0; i < lights.Count; i++)
+            {
+                lightPositions[i] += move;
+                lights[i].thisMesh?.TransformObject(Matrix4.CreateTranslation(move));
+            }
         }
 
         public void Render(Matrix4 cameraM)
@@ -100,6 +139,8 @@ namespace Rasterizer
             //Console.WriteLine("FPS: " + calc);
             timer.Reset();
             timer.Start();
+
+            LampAnimation(frameDuration);
 
             world.childNodes[0].thisMesh?.TransformObject(Matrix4.CreateTranslation((-xAddTemp * frameDuration, 0, 0)));
             if (useRenderTarget) target?.Bind();
@@ -119,7 +160,7 @@ namespace Rasterizer
                 {
                     Matrix4 toWorld = childNode.thisMesh.localTransform * parentMatrix;
                     Mesh thisMesh = childNode.thisMesh;
-                    childNode.thisMesh.Render(thisMesh.localShader, toWorld * cameraM * perspectiveMatrix,toWorld, thisMesh.localTexture, lightColor, lightPosition, cameraM.ExtractTranslation(), thisMesh.specularCoefficient, thisMesh.n);
+                    childNode.thisMesh.Render(thisMesh.localShader, lightPositions, lightColors, toWorld * cameraM * perspectiveMatrix,toWorld, thisMesh.localTexture, cameraM.ExtractTranslation(), thisMesh.specularCoefficient, thisMesh.n);
                     RenderFromChildNode(childNode, cameraM, childNode.thisMesh.localTransform);
                 }
             }
